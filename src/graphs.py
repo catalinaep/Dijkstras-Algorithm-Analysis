@@ -16,6 +16,7 @@ class AdjMatrix:
     
 
     def dijkstra_linear(self, source):
+        #TODO add print of shortest distance and reconstruct path
         #Set source dist to 0 and all others to infinity
         source_vertex = self.vertex_data.index(source)
         dist = [float("inf")] * self.size
@@ -28,8 +29,8 @@ class AdjMatrix:
             min_dist = float('inf')
             u = None
             for i in range(self.size):
-                if i not in visited and dist[i] < min:
-                    min = dist[i]
+                if i not in visited and dist[i] < min_dist:
+                    min_dist = dist[i]
                     u = i
             
             # All reachable vertices have been visited
@@ -49,9 +50,7 @@ class AdjMatrix:
         
         return dist 
 
-    def dijkstra_priority(self, source):
-        #TODO implement the priority version
-        pass           
+             
 
 
 
@@ -82,17 +81,18 @@ class AdjList:
             self.vertex_data[vertex] = data
     
     def dijkstra_linear(self, source):
-        source_vertex = self.vertex_data(source)
-        dist = [float('inf')] + self.size
-        dist[source] = 0
+        #TODO add print of shortest distance and reconstruct path
+        source_vertex = self.vertex_data.index(source)
+        dist = [float('inf')] * self.size
+        dist[source_vertex] = 0
 
         visited = set()
         for _ in range(self.size):
             min_dist = float('inf')
             u = None
             for i in range(self.size):
-                if i not in visited and dist[i] < min:
-                    min = dist[i]
+                if i not in visited and dist[i] < min_dist:
+                    min_dist = dist[i]
                     u = i
         
         # All reachable vertices have been visited
@@ -102,14 +102,10 @@ class AdjList:
             visited.add(u)
 
             #for each of u's neighbors, relax the distance and replace if smaller
-            for v in range(self.size):
-                #check if a neighbor and that it hasn't been visite
-                is_neighbor = any(neighbor == v for neighbor, weight in self[v])
-                if is_neighbor and v not in visited:
-                    neighbor_weight = next(w for n, w in self.add_list[v] if n == v)
-                    relaxation = dist[u] + neighbor_weight
+            for v, weight in self.adj_list[u]:
+                if v not in visited:
+                    relaxation = dist[u] + weight
                     if relaxation < dist[v]:
-                        #replace distance
                         dist[v] = relaxation
 
         return dist
@@ -117,3 +113,24 @@ class AdjList:
     def dijkstra_priority(self, source):
         #TODO implement the priority version
         pass
+
+#sparse graph 1 from instructions
+graph = AdjList(6)
+graph.add_vertex_data(0, 'A')
+graph.add_vertex_data(1, 'B')
+graph.add_vertex_data(2, 'C')
+graph.add_vertex_data(3, 'D')
+graph.add_vertex_data(4, 'E')
+graph.add_vertex_data(5, 'F')
+
+graph.add_edge(0,1,4)
+graph.add_edge(0,2,2)
+graph.add_edge(1,3,5)
+graph.add_edge(2,3,1)
+graph.add_edge(3,4,3)
+graph.add_edge(4,5,2)
+
+print("\nDijkstra's Algorithm starting from vertex D:")
+distances = graph.dijkstra_linear('D')
+for i , d in enumerate(distances):
+    print(f"Distance from D to {graph.vertex_data[i]}: {d}")
