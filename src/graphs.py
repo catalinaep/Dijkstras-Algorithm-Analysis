@@ -2,13 +2,14 @@ class AdjMatrix:
     def __init__(self, size):
         self.size = size # number of vertices
         self.adj_matrix = [[0] * size for _ in range(size)]
-        self.vertex_data = [''] * size # names of vertices
+        self.vertex_data = [''] * size
         
     def add_edge(self, u, v, weight):
         if 0 <= u < self.size and 0 <= v < self.size:
             #graph is expected to be undirected
             self.adj_matrix[u][v] = weight
             self.adj_matrix[v][u] = weight
+
     def add_vertex_data(self, vertex, data):
         if 0 <= vertex < self.size:
             self.vertex_data[vertex] = data
@@ -54,8 +55,11 @@ class AdjMatrix:
 
 
 class AdjList:
-    def __init__(self):
+    def __init__(self, size):
         self.adj_list = {}
+        #names of vertices
+        self.vertex_data = [''] * size
+        self.size = size
     
     def add_vertex(self, v):
         if v not in self.adj_list:
@@ -68,3 +72,40 @@ class AdjList:
         # graph expected to be undirected
         self.adj_list[u].append((v, weight))
         self.adj_list[v].append((u, weight))
+    
+    def add_vertex_data(self, vertex, data):
+        if 0 <= vertex < self.size:
+            self.vertex_data[vertex] = data
+    
+    def dijkstra(self, source):
+        source_vertex = self.vertex_data(source)
+        dist = [float('inf')] + self.size
+        dist[source] = 0
+
+        visited = set()
+        for _ in range(self.size):
+            min_dist = float('inf')
+            u = None
+            for i in range(self.size):
+                if i not in visited and dist[i] < min:
+                    min = dist[i]
+                    u = i
+        
+        # All reachable vertices have been visited
+            if u is None:
+                break
+
+            visited.add(u)
+
+            #for each of u's neighbors, relax the distance and replace if smaller
+            for v in range(self.size):
+                #check if a neighbor and that it hasn't been visite
+                is_neighbor = any(neighbor == v for neighbor, weight in self[v])
+                if is_neighbor and v not in visited:
+                    neighbor_weight = next(w for n, w in self.add_list[v] if n == v)
+                    relaxation = dist[u] + neighbor_weight
+                    if relaxation < dist[v]:
+                        #replace distance
+                        dist[v] = relaxation
+
+        return dist
