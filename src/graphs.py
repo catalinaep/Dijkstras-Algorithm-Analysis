@@ -15,7 +15,7 @@ class AdjMatrix:
             self.vertex_data[vertex] = data
     
 
-    def dijkstra(self, source):
+    def dijkstra_linear(self, source):
         #Set source dist to 0 and all others to infinity
         source_vertex = self.vertex_data.index(source)
         dist = [float("inf")] * self.size
@@ -47,7 +47,11 @@ class AdjMatrix:
                         #replace distance
                         dist[v] = relaxation
         
-        return dist            
+        return dist 
+
+    def dijkstra_priority(self, source):
+        #TODO implement the priority version
+        pass           
 
 
 
@@ -77,7 +81,7 @@ class AdjList:
         if 0 <= vertex < self.size:
             self.vertex_data[vertex] = data
     
-    def dijkstra(self, source):
+    def dijkstra_linear(self, source):
         source_vertex = self.vertex_data(source)
         dist = [float('inf')] + self.size
         dist[source] = 0
@@ -109,3 +113,7 @@ class AdjList:
                         dist[v] = relaxation
 
         return dist
+    
+    def dijkstra_priority(self, source):
+        #TODO implement the priority version
+        pass
