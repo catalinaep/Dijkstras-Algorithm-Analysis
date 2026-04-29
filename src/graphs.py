@@ -18,7 +18,7 @@ class AdjList:
         self.adj_list = {}
     
     def add_vertex(self, v):
-        if n not in self.adj_list:
+        if v not in self.adj_list:
             self.adj_list[v] =[]
 
     def add_edge(self, u, v):
