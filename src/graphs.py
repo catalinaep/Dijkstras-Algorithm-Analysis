@@ -1,7 +1,7 @@
 class AdjMatrix:
     def __init__(self, size):
-        self.adj_matrix = [[0] * size for _ in range(size)]
         self.size = size # number of vertices
+        self.adj_matrix = [[0] * size for _ in range(size)]
         self.vertex_data = [''] * size # names of vertices
         
     def add_edge(self, u, v, weight):
@@ -12,6 +12,46 @@ class AdjMatrix:
     def add_vertex_data(self, vertex, data):
         if 0 <= vertex < self.size:
             self.vertex_data[vertex] = data
+    
+
+    def dijkstra(self, source):
+        #Set source dist to 0 and all others to infinity
+        source_vertex = self.vertex_data.index(source)
+        dist = [float("inf")] * self.size
+        dist[source_vertex] = 0
+
+        visited = set()
+        
+        #find the vertex with the smallest weight
+        for _ in range(self.size):
+            min_dist = float('inf')
+            u = None
+            for i in range(self.size):
+                if i not in visited and dist[i] < min:
+                    min = dist[i]
+                    u = i
+            
+            # All reachable vertices have been visited
+            if u is None:
+                break
+
+            visited.add(u)
+
+            #for each of u's neighbors, relax the distance and replace if smaller
+            for v in range(self.size):
+                #check if a neighbor and that it hasn't been visited
+                if self.adj_matrix[u][v] != 0 and v not in visited:
+                    relaxation = dist[u] + self.adj_matrix[u][v]
+                    if relaxation < dist[v]:
+                        #replace distance
+                        dist[v] = relaxation
+        
+        return dist            
+
+
+
+
+
 
 class AdjList:
     def __init__(self):
