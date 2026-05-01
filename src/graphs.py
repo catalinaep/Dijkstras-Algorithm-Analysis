@@ -15,12 +15,16 @@ class AdjMatrix:
             self.vertex_data[vertex] = data
     
 
-    def dijkstra_linear(self, source):
+    def dijkstra_linear(self, source, target):
         #TODO add print of shortest distance and reconstruct path
         #Set source dist to 0 and all others to infinity
-        source_vertex = self.vertex_data.index(source)
+        source_index = self.vertex_data.index(source)
+        target_index = self.vertex_data.index(target)
         dist = [float("inf")] * self.size
-        dist[source_vertex] = 0
+        dist[source_index] = 0
+
+        #keeps track of path
+        parent_nodes = [None] * self.size
 
         visited = set()
         
@@ -47,8 +51,32 @@ class AdjMatrix:
                     if relaxation < dist[v]:
                         #replace distance
                         dist[v] = relaxation
-        
-        return dist 
+                        parent_nodes[v] = u
+                        
+        return self.print_path(source, target_index, dist, parent_nodes) 
+
+    def print_path(self, source, target_index, dist, parent_nodes):
+        path = []
+        curr = target_index
+
+        while curr is not None:
+            path.append(self.vertex_data[curr])
+            curr = parent_nodes[curr]
+
+        path.reverse()
+
+        if dist[target_index] == float('inf'):
+            print("No path to given target")
+            return
+
+
+        print("Shortest path:", " -> ".join(path))
+        print("Total cost:", dist[target_index])
+
+        for i, d in enumerate(dist):
+            print(f"Distance from {source} to {self.vertex_data[i]}: {d}")    
+         
+
 
              
 
@@ -80,11 +108,13 @@ class AdjList:
         if 0 <= vertex < self.size:
             self.vertex_data[vertex] = data
     
-    def dijkstra_linear(self, source):
+    def dijkstra_linear(self, source, target):
         #TODO add print of shortest distance and reconstruct path
-        source_vertex = self.vertex_data.index(source)
+        source_index = self.vertex_data.index(source)
+        target_index = self.vertex_data.index(target)
         dist = [float('inf')] * self.size
-        dist[source_vertex] = 0
+        dist[source_index] = 0
+        parent_nodes = [None] * self.size
 
         visited = set()
         for _ in range(self.size):
@@ -107,30 +137,72 @@ class AdjList:
                     relaxation = dist[u] + weight
                     if relaxation < dist[v]:
                         dist[v] = relaxation
+                        parent_nodes[v] = u
+        return self.print_path(source, target_index, dist, parent_nodes)
 
-        return dist
+        
+    
+    def print_path(self, source, target_index, dist, parent_nodes):
+        path = []
+        curr = target_index
+
+        while curr is not None:
+            path.append(self.vertex_data[curr])
+            curr = parent_nodes[curr]
+
+        path.reverse()
+
+        if dist[target_index] == float('inf'):
+            print("No path to given target")
+            return
+
+
+        print("Shortest path:", " -> ".join(path))
+        print("Total cost:", dist[target_index])
+
+        for i, d in enumerate(dist):
+            print(f"Distance from {source} to {self.vertex_data[i]}: {d}")
     
     def dijkstra_priority(self, source):
         #TODO implement the priority version
         pass
 
-#sparse graph 1 from instructions
-graph = AdjList(6)
-graph.add_vertex_data(0, 'A')
-graph.add_vertex_data(1, 'B')
-graph.add_vertex_data(2, 'C')
-graph.add_vertex_data(3, 'D')
-graph.add_vertex_data(4, 'E')
-graph.add_vertex_data(5, 'F')
+#==========tests==================
 
-graph.add_edge(0,1,4)
-graph.add_edge(0,2,2)
-graph.add_edge(1,3,5)
-graph.add_edge(2,3,1)
-graph.add_edge(3,4,3)
-graph.add_edge(4,5,2)
 
-print("\nDijkstra's Algorithm starting from vertex D:")
-distances = graph.dijkstra_linear('D')
-for i , d in enumerate(distances):
-    print(f"Distance from D to {graph.vertex_data[i]}: {d}")
+graph1= AdjMatrix(6)
+print("ADJ MATRIX TEST========================")
+graph1.add_vertex_data(0, 'A')
+graph1.add_vertex_data(1, 'B')
+graph1.add_vertex_data(2, 'C')
+graph1.add_vertex_data(3, 'D')
+graph1.add_vertex_data(4, 'E')
+graph1.add_vertex_data(5, 'F')
+
+graph1.add_edge(0,1,4)
+graph1.add_edge(0,2,2)
+graph1.add_edge(1,3,5)
+graph1.add_edge(2,3,1)
+graph1.add_edge(3,4,3)
+graph1.add_edge(4,5,2)
+
+graph1.dijkstra_linear('A', 'F')
+
+#list
+print("ADJ LIST TEST ======================")
+graph2 = AdjList(6)
+graph2.add_vertex_data(0, 'A')
+graph2.add_vertex_data(1, 'B')
+graph2.add_vertex_data(2, 'C')
+graph2.add_vertex_data(3, 'D')
+graph2.add_vertex_data(4, 'E')
+graph2.add_vertex_data(5, 'F')
+graph2
+graph2.add_edge(0,1,4)
+graph2.add_edge(0,2,2)
+graph2.add_edge(1,3,5)
+graph2.add_edge(2,3,1)
+graph2.add_edge(3,4,3)
+graph2.add_edge(4,5,2)
+graph2
+graph2.dijkstra_linear('A', 'D')
