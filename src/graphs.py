@@ -77,12 +77,7 @@ class AdjMatrix:
             print(f"Distance from {source} to {self.vertex_data[i]}: {d}")    
          
 
-
-             
-
-
-
-
+################################################################################
 
 
 class AdjList:
