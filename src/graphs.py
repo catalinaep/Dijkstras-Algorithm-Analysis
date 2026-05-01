@@ -1,3 +1,50 @@
+"""
+ * Dijkstra Implementation Analysis (Project 2)
+ * 
+ *   Course: CS361
+ *  Section: 001
+ *  Authors:
+ *     Catalina Padilla
+ *     Robert Vanderburg
+ *  Project: Dijkstra Impelemntation Analysis
+ * Filename: graphs.py
+ * 
+ * Description:
+ * Implements Dijkstra's algorithm using 3 different data structures: an array, a matrix, and a min-
+ * heap priority queue. Provides an analysis on timing and memory usage across the different
+ * implementations.
+"""
+
+import heapq
+import time
+import sys
+
+
+GRAPHS = {
+        'SG1': {
+            'vertices': 'ABCDEF',
+            'weights': [(0,1,4), (0,2,2), (1,3,5), (2,3,1), (3,4,3), (4,5,2)]
+        },
+        'SG2': {
+            'vertices': '1234567',
+            'weights': [(0,1,3), (0,2,6), (1,3,2), (2,4,4), (3,5,6), (4,6,1), (1,4,5)]
+        },
+        'DG1': {
+            'vertices': 'ABCDE',
+            'weights': [
+                (0,1,2), (0,2,5), (0,3,1), (0,4,4), (1,2,3), (1,3,2), (1,4,6), 
+                (2,3,3), (2,4,1), (3,4,2)
+            ]
+        },
+        'DG2': {
+            'vertices': '123456',
+            'weights': [
+                (0,1,3), (0,4,5), (1,2,1), (2,3,3), (3,4,2), (4,5,1), (0,2,2), (1,3,2), 
+                (1,4,4), (2,4,6), (0,3,6), (0,5,4), (1,5,7), (2,5,5), (3,5,4)
+            ]
+        }
+    }
+
 class AdjMatrix:
     def __init__(self, size):
         self.size = size # number of vertices
@@ -164,45 +211,60 @@ class AdjList:
             print(f"Distance from {source} to {self.vertex_data[i]}: {d}")
     
     def dijkstra_priority(self, source):
-        #TODO implement the priority version
-        pass
+        source_vertex = self.vertex_data.index(source)
+        dist = [float('inf')] * self.size
+        dist[source_vertex] = 0
 
-#==========tests==================
+        prev = [None] * self.size
+
+        pq = [(0, source_vertex)]
+
+        visited = set()
+
+        while pq:
+            current_dist, u = heapq.heappop(pq)
+
+            if u in visited:
+                continue
+
+            visited.add(u)
+
+            if current_dist > dist[u]:
+                continue
+
+            for v, weight in self.adj_list[u]:
+                if v not in visited:
+                    relax = dist[u] + weight
+
+                    if relax < dist[v]:
+                        dist[v] = relax
+                        prev[v] = u
+                        heapq.heappush(pq, (relax, v))
+        return dist
 
 
-graph1= AdjMatrix(6)
-print("ADJ MATRIX TEST========================")
-graph1.add_vertex_data(0, 'A')
-graph1.add_vertex_data(1, 'B')
-graph1.add_vertex_data(2, 'C')
-graph1.add_vertex_data(3, 'D')
-graph1.add_vertex_data(4, 'E')
-graph1.add_vertex_data(5, 'F')
+def load_vertex_weights(graph_key, dijkstra):
+    """
+    Load the given graph data using graph_key from GRAPH into the Dijkstra algorithm class.
 
-graph1.add_edge(0,1,4)
-graph1.add_edge(0,2,2)
-graph1.add_edge(1,3,5)
-graph1.add_edge(2,3,1)
-graph1.add_edge(3,4,3)
-graph1.add_edge(4,5,2)
+    :param graph_key: String value key representing a graph in GRAPH.
+    :param dijkstra: AdjMatrix or AdjList class representing algorithm implmentation.
+    """
+    for idx, n in enumerate(GRAPHS[graph_key]['vertices']):
+        dijkstra.add_vertex_data(idx, n)
 
-graph1.dijkstra_linear('A', 'F')
+    for idx, n in enumerate(GRAPHS[graph_key]['weights']):
+        dijkstra.add_edge(n[0], n[1], n[2])
 
-#list
-print("ADJ LIST TEST ======================")
-graph2 = AdjList(6)
-graph2.add_vertex_data(0, 'A')
-graph2.add_vertex_data(1, 'B')
-graph2.add_vertex_data(2, 'C')
-graph2.add_vertex_data(3, 'D')
-graph2.add_vertex_data(4, 'E')
-graph2.add_vertex_data(5, 'F')
-graph2
-graph2.add_edge(0,1,4)
-graph2.add_edge(0,2,2)
-graph2.add_edge(1,3,5)
-graph2.add_edge(2,3,1)
-graph2.add_edge(3,4,3)
-graph2.add_edge(4,5,2)
-graph2
-graph2.dijkstra_linear('A', 'D')
+if __name__ == "__main__":
+    graph1= AdjMatrix(6)
+    print("ADJ MATRIX TEST========================")
+
+    load_vertex_weights('SG1', graph1)
+    graph1.dijkstra_linear('A', 'F')
+
+    #list
+    print("ADJ LIST TEST ======================")
+    graph2 = AdjList(6)
+    load_vertex_weights('SG1', graph2)
+    graph2.dijkstra_linear('A', 'D')
