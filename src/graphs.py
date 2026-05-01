@@ -61,12 +61,16 @@ class AdjMatrix:
             self.vertex_data[vertex] = data
     
 
-    def dijkstra_linear(self, source):
+    def dijkstra_linear(self, source, target):
         #TODO add print of shortest distance and reconstruct path
         #Set source dist to 0 and all others to infinity
-        source_vertex = self.vertex_data.index(source)
+        source_index = self.vertex_data.index(source)
+        target_index = self.vertex_data.index(target)
         dist = [float("inf")] * self.size
-        dist[source_vertex] = 0
+        dist[source_index] = 0
+
+        #keeps track of path
+        parent_nodes = [None] * self.size
 
         visited = set()
         
@@ -93,8 +97,30 @@ class AdjMatrix:
                     if relaxation < dist[v]:
                         #replace distance
                         dist[v] = relaxation
-        
-        return dist 
+                        parent_nodes[v] = u
+                        
+        return self.print_path(source, target_index, dist, parent_nodes) 
+
+    def print_path(self, source, target_index, dist, parent_nodes):
+        path = []
+        curr = target_index
+
+        while curr is not None:
+            path.append(self.vertex_data[curr])
+            curr = parent_nodes[curr]
+
+        path.reverse()
+
+        if dist[target_index] == float('inf'):
+            print("No path to given target")
+            return
+
+
+        print("Shortest path:", " -> ".join(path))
+        print("Total cost:", dist[target_index])
+
+        for i, d in enumerate(dist):
+            print(f"Distance from {source} to {self.vertex_data[i]}: {d}") 
 
 class AdjList:
     def __init__(self, size):
@@ -119,11 +145,13 @@ class AdjList:
         if 0 <= vertex < self.size:
             self.vertex_data[vertex] = data
     
-    def dijkstra_linear(self, source):
+    def dijkstra_linear(self, source, target):
         #TODO add print of shortest distance and reconstruct path
-        source_vertex = self.vertex_data.index(source)
+        source_index = self.vertex_data.index(source)
+        target_index = self.vertex_data.index(target)
         dist = [float('inf')] * self.size
-        dist[source_vertex] = 0
+        dist[source_index] = 0
+        parent_nodes = [None] * self.size
 
         visited = set()
         for _ in range(self.size):
@@ -146,8 +174,31 @@ class AdjList:
                     relaxation = dist[u] + weight
                     if relaxation < dist[v]:
                         dist[v] = relaxation
+                        parent_nodes[v] = u
+        return self.print_path(source, target_index, dist, parent_nodes)
 
-        return dist
+        
+    
+    def print_path(self, source, target_index, dist, parent_nodes):
+        path = []
+        curr = target_index
+
+        while curr is not None:
+            path.append(self.vertex_data[curr])
+            curr = parent_nodes[curr]
+
+        path.reverse()
+
+        if dist[target_index] == float('inf'):
+            print("No path to given target")
+            return
+
+
+        print("Shortest path:", " -> ".join(path))
+        print("Total cost:", dist[target_index])
+
+        for i, d in enumerate(dist):
+            print(f"Distance from {source} to {self.vertex_data[i]}: {d}")
     
     def dijkstra_priority(self, source):
         source_vertex = self.vertex_data.index(source)
