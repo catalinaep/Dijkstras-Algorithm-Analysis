@@ -6,7 +6,7 @@
  *  Authors:
  *     Catalina Padilla
  *     Robert Vanderburg
- *  Project: Dijkstra Impelemntation Analysis
+ *  Project: Dijkstra Implementation Analysis
  * Filename: graphs.py
  * 
  * Description:
@@ -18,6 +18,7 @@
 import heapq
 import time
 import sys
+import tracemalloc
 
 
 GRAPHS = {
@@ -63,8 +64,6 @@ class AdjMatrix:
     
 
     def dijkstra_linear(self, source, target):
-        #TODO add print of shortest distance and reconstruct path
-        #Set source dist to 0 and all others to infinity
         source_index = self.vertex_data.index(source)
         target_index = self.vertex_data.index(target)
         dist = [float("inf")] * self.size
@@ -251,15 +250,59 @@ def load_vertex_weights(graph_key, dijkstra):
     for idx, n in enumerate(GRAPHS[graph_key]['weights']):
         dijkstra.add_edge(n[0], n[1], n[2])
 
+def measure_time(func, *args):
+    times = []
+    for _ in range(5):
+        start = time.time()
+        func(*args)
+        end = time.time()
+        times.append(end - start)
+    return (sum(times) / 5) * 1000  # ms
+
+def measure_memory(func, *args):
+    tracemalloc.start()
+    func(*args)
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return peak
+
+
 if __name__ == "__main__":
-    graph1= AdjMatrix(6)
-    print("ADJ MATRIX TEST========================")
+    #SPARSE GRAPH 1 ADJ MATRIX TESTING====================================
+    sparse_graph1= AdjList(6)
+    print("ADJ LIST TEST SPARSE GRAPH 1========================")
 
-    load_vertex_weights('SG1', graph1)
-    graph1.dijkstra_linear('A', 'F')
+    load_vertex_weights('SG1', sparse_graph1)
+    #linear testing
+    sparse1_linear_time = measure_time(sparse_graph1.dijkstra_linear, 'A', 'F')
+    sparse1_linear_mem = measure_memory(sparse_graph1.dijkstra_linear, 'A', 'F')
+    print("\n===================================================")
+    print(f"Graph 1 Linear Time Results (Adj List): {sparse1_linear_time:.6f}ms")
+    print(f"Graph 1 Linear Memory Results (Adj List): {sparse1_linear_mem:.6f}")
 
-    #list
-    print("ADJ LIST TEST ======================")
-    graph2 = AdjList(6)
-    load_vertex_weights('SG1', graph2)
-    graph2.dijkstra_linear('A', 'D')
+    #heap testing
+    sparse1_heap_time = measure_time(sparse_graph1.dijkstra_priority, 'A')
+    sparse1_heap_mem = measure_memory(sparse_graph1.dijkstra_priority, 'A')
+    print("\n===================================================")
+    print(f"Graph 1 Heap Time Results (Adj List): {sparse1_heap_time:.6f}ms")
+    print(f"Graph 1 Heap Memory Results (Adj List): {sparse1_heap_mem:.6f}")
+    
+    
+    #SPARSE GRAPH 2 ADJ LIST TESTING======================================
+    sparse_graph2= AdjList(6)
+    print("ADJ LIST TEST SPARSE GRAPH 2========================")
+
+    load_vertex_weights('SG2', sparse_graph2)
+    #linear testing
+    sparse2_linear_time = measure_time(sparse_graph2.dijkstra_linear, '1', '6')
+    sparse2_linear_mem = measure_memory(sparse_graph2.dijkstra_linear, '1', '6')
+    print("\n===================================================")
+    print(f"Graph 2 Linear Time Results (Adj List): {sparse2_linear_time:.6f}ms")
+    print(f"Graph 2 Linear Memory Results (Adj List): {sparse2_linear_mem:.6f}")
+
+    #heap testing
+    sparse2_heap_time = measure_time(sparse_graph2.dijkstra_priority, '1')
+    sparse2_heap_mem = measure_memory(sparse_graph2.dijkstra_priority, '1')
+    print("\n===================================================")
+    print(f"Graph 2 Heap Time Results (Adj List): {sparse2_heap_time:.6f}ms")
+    print(f"Graph 2 Heap Memory Results (Adj List): {sparse2_heap_mem:.6f}")
