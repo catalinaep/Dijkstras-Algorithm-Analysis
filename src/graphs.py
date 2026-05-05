@@ -24,6 +24,7 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Dictionary representation of the graphs.
 GRAPHS = {
         'SG1': {
             'vertices': ['A','B','C','D','E','F'],
@@ -49,26 +50,51 @@ GRAPHS = {
         }
     }
 
-
 class AdjMatrix:
+    """
+    Class used to represent Dijkstra using an adjacency matrix.
+
+    :param size: The size of the matrix to be generated.
+    """
     def __init__(self, size):
         self.size = size # number of vertices
         self.adj_matrix = [[0] * size for _ in range(size)]
         self.vertex_data = [''] * size
         self.run = []
-        
+    
+    
     def add_edge(self, u, v, weight):
+        """
+        Add the edge weight to the matrix. Assumes graphs are undirected.
+
+        :param u: integer representing edges
+        :param v: integer representing vertices
+        :param weight: integer representing the edge weight.
+        """
         if 0 <= u < self.size and 0 <= v < self.size:
             #graph is expected to be undirected
             self.adj_matrix[u][v] = weight
             self.adj_matrix[v][u] = weight
 
-    def add_vertex_data(self, vertex, data):
+
+    def add_vertex_data(self, vertex, vertex_tuple):
+        """
+        Add vertex tuple data including connected vertices and weight (u1, u2, w).
+
+        :param vertex: integer representing a vertex index.
+        :param vertex_tuple: tuple representing two connected nodes, including edge weight.
+        """
         if 0 <= vertex < self.size:
-            self.vertex_data[vertex] = data
-    
+            self.vertex_data[vertex] = vertex_tuple
 
     def dijkstra_Matrix(self, source, target):
+        """
+        Matrix searching Dijkstra implementation using a source and target to calculate route. Appends
+        path data to the run class attribute.
+
+        :param source: string representation of the source node to start search.
+        :param target: string representation of the target node to optimize for.
+        """
         source_index = self.vertex_data.index(source)
         target_index = self.vertex_data.index(target)
         dist = [float("inf")] * self.size
@@ -106,8 +132,16 @@ class AdjMatrix:
                         
         self.run = []
         self.run.append((source_index, target_index, dist, parent_nodes))
-
+    
     def print_path(self, source, target_index, dist, parent_nodes):
+        """
+        Print the path, weights, and individual decisions from source node to target node.
+
+        :param source: String representation of the source node.
+        :param target_index: Integer index of the target node.
+        :param dist: List of integers representing chosen edge weights for shortes path.
+        :param parent_nodes: List of integers representing parent nodes.
+        """
         path = []
         curr = target_index
 
@@ -302,7 +336,15 @@ def generate_graph(num_vertices, edge_density, weight_range):
    
     return graph
 
+
     def random_graph_analysis():
+        """
+        Generates 50 random graphs and measures execution time and memory usage for both priority 
+        queue and linear search implementations. Results are displayed as scatter plots comparing performance
+        across different graph sizes.
+        
+        :return: None. Displays matplotlib visualization of results.
+        """
         for i in range(50):
             num_vertices = random.randint(100,1000)
             min_weight = random.randint(1,15)
@@ -378,135 +420,143 @@ def generate_graph(num_vertices, edge_density, weight_range):
 
 
 if __name__ == "__main__":
-    #SPARSE GRAPH 1 ADJ MATRIX TESTING====================================
-    sparse_graph1= AdjList(6)
-    print("\n============| ADJ LIST TEST SPARSE GRAPH 1 |=============")
+    """
+    To run the graph analysis using random graph properties, set RUN_GRAPH_ANALYSIS below to True. 
+    Otherwise the 5 handcrafted graphs analysis runs and prints to terminal.
+    """
+    RUN_GRAPH_ANALYSIS = False
 
-    load_vertex_weights('SG1', sparse_graph1)
-    #linear testing
-    sparse1_linear_time = measure_time(sparse_graph1.dijkstra_linear, 'A', 'F')
-    sparse1_linear_mem = measure_memory(sparse_graph1.dijkstra_linear, 'A', 'F')
-    print("\n===================================================\n")
-    print(f"Graph 1 Linear Time Results (Adj List): {sparse1_linear_time:.6f}ms")
-    print(f"Graph 1 Linear Memory Results (Adj List): {sparse1_linear_mem:.6f}")
-    run = sparse_graph1.run
-    sparse_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+    if (RUN_GRAPH_ANALYSIS):
+        random_graph_analysis()
+    else:
+        #SPARSE GRAPH 1 ADJ MATRIX TESTING====================================
+        sparse_graph1= AdjList(6)
+        print("\n============| ADJ LIST TEST SPARSE GRAPH 1 |=============")
 
-
-    #heap testing
-    sparse1_heap_time = measure_time(sparse_graph1.dijkstra_priority, 'A', 'F')
-    sparse1_heap_mem = measure_memory(sparse_graph1.dijkstra_priority, 'A', 'F')
-    print("\n===================================================\n")
-    print(f"Graph 1 Heap Time Results (Adj List): {sparse1_heap_time:.6f}ms")
-    print(f"Graph 1 Heap Memory Results (Adj List): {sparse1_heap_mem:.6f}")
-    run = sparse_graph1.run
-    sparse_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
-    
-
-    #SPARSE GRAPH 2 ADJ LIST TESTING======================================
-    sparse_graph2= AdjList(7)
-    print("\n============| ADJ LIST TEST SPARSE GRAPH 2 |============")
-
-    load_vertex_weights('SG2', sparse_graph2)
-    #linear testing
-    sparse2_linear_time = measure_time(sparse_graph2.dijkstra_linear, '1', '6')
-    sparse2_linear_mem = measure_memory(sparse_graph2.dijkstra_linear, '1', '6')
-    print("\n===================================================\n")
-    print(f"Graph 2 Linear Time Results (Adj List): {sparse2_linear_time:.6f}ms")
-    print(f"Graph 2 Linear Memory Results (Adj List): {sparse2_linear_mem:.6f}")
-    run = sparse_graph2.run
-    sparse_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
-
-    #heap testing
-    sparse2_heap_time = measure_time(sparse_graph2.dijkstra_priority, '1', '6')
-    sparse2_heap_mem = measure_memory(sparse_graph2.dijkstra_priority, '1', '6')
-    print("\n===================================================\n")
-    print(f"Graph 2 Heap Time Results (Adj List): {sparse2_heap_time:.6f}ms")
-    print(f"Graph 2 Heap Memory Results (Adj List): {sparse2_heap_mem:.6f}")
-    run = sparse_graph2.run
-    sparse_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+        load_vertex_weights('SG1', sparse_graph1)
+        #linear testing
+        sparse1_linear_time = measure_time(sparse_graph1.dijkstra_linear, 'A', 'F')
+        sparse1_linear_mem = measure_memory(sparse_graph1.dijkstra_linear, 'A', 'F')
+        print("\n===================================================\n")
+        print(f"Graph 1 Linear Time Results (Adj List): {sparse1_linear_time:.6f}ms")
+        print(f"Graph 1 Linear Memory Results (Adj List): {sparse1_linear_mem:.6f}")
+        run = sparse_graph1.run
+        sparse_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
 
-    #DENSE GRAPH 1 MATRIX LIST TESTING======================================
-    dense_graph1= AdjMatrix(5)
-    print("\n============| ADJ MATRIX TEST DENSE GRAPH 1 |============")
+        #heap testing
+        sparse1_heap_time = measure_time(sparse_graph1.dijkstra_priority, 'A', 'F')
+        sparse1_heap_mem = measure_memory(sparse_graph1.dijkstra_priority, 'A', 'F')
+        print("\n===================================================\n")
+        print(f"Graph 1 Heap Time Results (Adj List): {sparse1_heap_time:.6f}ms")
+        print(f"Graph 1 Heap Memory Results (Adj List): {sparse1_heap_mem:.6f}")
+        run = sparse_graph1.run
+        sparse_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+        
 
-    load_vertex_weights('DG1', dense_graph1)
-    #matrix testing
-    dense_matrix_time = measure_time(dense_graph1.dijkstra_Matrix, 'A', 'E')
-    dense_matrix_mem = measure_memory(dense_graph1.dijkstra_Matrix, 'A', 'E')
-    print("\n===================================================")
-    print(f"Dense Graph 1 Matrix Time Results (Adj List): {dense_matrix_time:.6f}ms")
-    print(f"Dense Graph 1 Matrix Memory Results (Adj List): {dense_matrix_mem:.6f}")
-    run = dense_graph1.run
-    dense_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+        #SPARSE GRAPH 2 ADJ LIST TESTING======================================
+        sparse_graph2= AdjList(7)
+        print("\n============| ADJ LIST TEST SPARSE GRAPH 2 |============")
 
-    dense_graph1 = AdjList(5)
-    load_vertex_weights('DG1', dense_graph1)
-    #heap testing
-    dense_heap_time = measure_time(dense_graph1.dijkstra_priority, 'A', 'E')
-    dense_heap_mem = measure_memory(dense_graph1.dijkstra_priority, 'A', 'E')
-    print("\n===================================================")
-    print(f"Dense Graph 1 Heap Time Results (Adj List): {dense_heap_time:.6f}ms")
-    print(f"Dense Graph 1 Heap Memory Results (Adj List): {dense_heap_mem:.6f}")
-    run = dense_graph1.run
-    dense_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+        load_vertex_weights('SG2', sparse_graph2)
+        #linear testing
+        sparse2_linear_time = measure_time(sparse_graph2.dijkstra_linear, '1', '6')
+        sparse2_linear_mem = measure_memory(sparse_graph2.dijkstra_linear, '1', '6')
+        print("\n===================================================\n")
+        print(f"Graph 2 Linear Time Results (Adj List): {sparse2_linear_time:.6f}ms")
+        print(f"Graph 2 Linear Memory Results (Adj List): {sparse2_linear_mem:.6f}")
+        run = sparse_graph2.run
+        sparse_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
-
-    #DENSE GRAPH 2 ADJ MATRIX TESTING======================================
-    dense_graph2= AdjMatrix(6)
-    print("\n============| ADJ MATRIX TEST DENSE GRAPH 2 |============")
-
-    load_vertex_weights('DG2', dense_graph2)
-    #matrix testing
-    dense_matrix_time = measure_time(dense_graph2.dijkstra_Matrix, '1', '5')
-    dense_matrix_mem = measure_memory(dense_graph2.dijkstra_Matrix, '1', '5')
-    print("\n===================================================")
-    print(f"Dense Graph 2 Matrix Time Results (Adj Matrix): {dense_matrix_time:.6f}ms")
-    print(f"Dense Graph 2 Matrix Memory Results (Adj Matrix): {dense_matrix_mem:.6f}")
-    run = dense_graph2.run
-    dense_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
-
-    dense_graph2 = AdjList(6)
-    load_vertex_weights('DG2', dense_graph2)
-    #heap testing
-    dense_heap_time = measure_time(dense_graph2.dijkstra_priority, '1', '5')
-    dense_heap_mem = measure_memory(dense_graph2.dijkstra_priority, '1', '5')
-    print("\n===================================================")
-    print(f"Dense Graph 2 Heap Time Results (Adj List): {dense_heap_time:.6f}ms")
-    print(f"Dense Graph 2 Heap Memory Results (Adj List): {dense_heap_mem:.6f}")
-    run = dense_graph2.run
-    dense_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+        #heap testing
+        sparse2_heap_time = measure_time(sparse_graph2.dijkstra_priority, '1', '6')
+        sparse2_heap_mem = measure_memory(sparse_graph2.dijkstra_priority, '1', '6')
+        print("\n===================================================\n")
+        print(f"Graph 2 Heap Time Results (Adj List): {sparse2_heap_time:.6f}ms")
+        print(f"Graph 2 Heap Memory Results (Adj List): {sparse2_heap_mem:.6f}")
+        run = sparse_graph2.run
+        sparse_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
 
-     #DENSE GRAPH 2 ADJ MATRIX TESTING======================================
-    dense_graph3= AdjMatrix(250)
-    print("\n============| ADJ MATRIX TEST DENSE GRAPH 3 |============")
+        #DENSE GRAPH 1 MATRIX LIST TESTING======================================
+        dense_graph1= AdjMatrix(5)
+        print("\n============| ADJ MATRIX TEST DENSE GRAPH 1 |============")
 
-    graph_data = generate_graph(250, 0.5, (5,25))
-    GRAPHS['DG3'] = graph_data
+        load_vertex_weights('DG1', dense_graph1)
+        #matrix testing
+        dense_matrix_time = measure_time(dense_graph1.dijkstra_Matrix, 'A', 'E')
+        dense_matrix_mem = measure_memory(dense_graph1.dijkstra_Matrix, 'A', 'E')
+        print("\n===================================================")
+        print(f"Dense Graph 1 Matrix Time Results (Adj List): {dense_matrix_time:.6f}ms")
+        print(f"Dense Graph 1 Matrix Memory Results (Adj List): {dense_matrix_mem:.6f}")
+        run = dense_graph1.run
+        dense_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
-    load_vertex_weights('DG3', dense_graph3)
-    #matrix testing
-    dense_matrix_time = measure_time(dense_graph3.dijkstra_Matrix, '1', '127')
-    dense_matrix_mem = measure_memory(dense_graph3.dijkstra_Matrix, '1', '127')
-    print("\n===================================================")
-    print(f"Dense Graph 3 Matrix Time Results (Adj Matrix): {dense_matrix_time:.6f}ms")
-    print(f"Dense Graph 3 Matrix Memory Results (Adj Matrix): {dense_matrix_mem:.6f}")
-    run = dense_graph3.run
-    dense_graph3.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+        dense_graph1 = AdjList(5)
+        load_vertex_weights('DG1', dense_graph1)
+        #heap testing
+        dense_heap_time = measure_time(dense_graph1.dijkstra_priority, 'A', 'E')
+        dense_heap_mem = measure_memory(dense_graph1.dijkstra_priority, 'A', 'E')
+        print("\n===================================================")
+        print(f"Dense Graph 1 Heap Time Results (Adj List): {dense_heap_time:.6f}ms")
+        print(f"Dense Graph 1 Heap Memory Results (Adj List): {dense_heap_mem:.6f}")
+        run = dense_graph1.run
+        dense_graph1.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
-    dense_graph3 = AdjList(250)
-    load_vertex_weights('DG3', dense_graph3)
-    #heap testing
-    dense_heap_time = measure_time(dense_graph3.dijkstra_priority, '1', '127')
-    dense_heap_mem = measure_memory(dense_graph3.dijkstra_priority, '1', '127')
-    print("\n===================================================")
-    print(f"Dense Graph 3 Heap Time Results (Adj List): {dense_heap_time:.6f}ms")
-    print(f"Dense Graph 3 Heap Memory Results (Adj List): {dense_heap_mem:.6f}")
-    run = dense_graph3.run
-    dense_graph3.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
+        #DENSE GRAPH 2 ADJ MATRIX TESTING======================================
+        dense_graph2= AdjMatrix(6)
+        print("\n============| ADJ MATRIX TEST DENSE GRAPH 2 |============")
+
+        load_vertex_weights('DG2', dense_graph2)
+        #matrix testing
+        dense_matrix_time = measure_time(dense_graph2.dijkstra_Matrix, '1', '5')
+        dense_matrix_mem = measure_memory(dense_graph2.dijkstra_Matrix, '1', '5')
+        print("\n===================================================")
+        print(f"Dense Graph 2 Matrix Time Results (Adj Matrix): {dense_matrix_time:.6f}ms")
+        print(f"Dense Graph 2 Matrix Memory Results (Adj Matrix): {dense_matrix_mem:.6f}")
+        run = dense_graph2.run
+        dense_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+
+        dense_graph2 = AdjList(6)
+        load_vertex_weights('DG2', dense_graph2)
+        #heap testing
+        dense_heap_time = measure_time(dense_graph2.dijkstra_priority, '1', '5')
+        dense_heap_mem = measure_memory(dense_graph2.dijkstra_priority, '1', '5')
+        print("\n===================================================")
+        print(f"Dense Graph 2 Heap Time Results (Adj List): {dense_heap_time:.6f}ms")
+        print(f"Dense Graph 2 Heap Memory Results (Adj List): {dense_heap_mem:.6f}")
+        run = dense_graph2.run
+        dense_graph2.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+
+
+        #DENSE GRAPH 2 ADJ MATRIX TESTING======================================
+        dense_graph3= AdjMatrix(250)
+        print("\n============| ADJ MATRIX TEST DENSE GRAPH 3 |============")
+
+        graph_data = generate_graph(250, 0.5, (5,25))
+        GRAPHS['DG3'] = graph_data
+
+        load_vertex_weights('DG3', dense_graph3)
+        #matrix testing
+        dense_matrix_time = measure_time(dense_graph3.dijkstra_Matrix, '1', '127')
+        dense_matrix_mem = measure_memory(dense_graph3.dijkstra_Matrix, '1', '127')
+        print("\n===================================================")
+        print(f"Dense Graph 3 Matrix Time Results (Adj Matrix): {dense_matrix_time:.6f}ms")
+        print(f"Dense Graph 3 Matrix Memory Results (Adj Matrix): {dense_matrix_mem:.6f}")
+        run = dense_graph3.run
+        dense_graph3.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
+
+        dense_graph3 = AdjList(250)
+        load_vertex_weights('DG3', dense_graph3)
+        #heap testing
+        dense_heap_time = measure_time(dense_graph3.dijkstra_priority, '1', '127')
+        dense_heap_mem = measure_memory(dense_graph3.dijkstra_priority, '1', '127')
+        print("\n===================================================")
+        print(f"Dense Graph 3 Heap Time Results (Adj List): {dense_heap_time:.6f}ms")
+        print(f"Dense Graph 3 Heap Memory Results (Adj List): {dense_heap_mem:.6f}")
+        run = dense_graph3.run
+        dense_graph3.print_path(run[0][0], run[0][1], run[0][2], run[0][3])
 
     
 
